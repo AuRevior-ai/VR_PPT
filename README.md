@@ -7,6 +7,7 @@
 把素材放在 `public/assets/classroom/`：
 
 - 只有一张图时：放 `original.png`，项目会自动使用单图 fallback。
+- 2:1 全景图：放 `full_classroom_2to1.png`，项目会优先识别为 360 equirectangular 全景模式。
 - 有分层素材时：放 `bg_wall.png`、`teacher_podium.png`、`desks_students_mid.png`、`students_foreground.png`、`overlays.png`，项目会优先使用分层场景。
 - `depth_map.png` 已预留路径，当前 MVP 暂未参与渲染。
 
@@ -51,7 +52,7 @@ npm run build
 
 页面右下角控制面板也可以实时调节。
 
-当前方案 A 仍然使用原图或分层图做“凹面广角”模拟，不会生成真实 90 度侧墙内容。若要真实 90 度以上视角，需要补充更宽的 180 度课堂图或左/中/右多视角素材。
+当前方案 C 初版会优先检测 `full_classroom_2to1.png` 是否存在，并确认图片接近 2:1。通过后会把图片贴到 Three.js 球体内壁，用透视相机在球心浏览；如果没有合格全景图，才回退到方案 A 的分层/单图凹面广角。
 
 ## 接入真实幼儿教育内容
 

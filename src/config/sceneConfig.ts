@@ -34,6 +34,7 @@ const basePath = '/assets/classroom';
 export const classroomAssets = {
   basePath,
   original: `${basePath}/original.png`,
+  panorama: `${basePath}/full_classroom_2to1.png`,
   depthMap: `${basePath}/depth_map.png`,
   layers: {
     bg_wall: `${basePath}/bg_wall.png`,
@@ -42,6 +43,14 @@ export const classroomAssets = {
     students_foreground: `${basePath}/students_foreground.png`,
     overlays: `${basePath}/overlays.png`
   }
+} as const;
+
+export const panoramaCamera = {
+  fov: 76,
+  initialYawDegrees: 90,
+  maxYawDegrees: 115,
+  maxPitchDegrees: 42,
+  radius: 500
 } as const;
 
 export const layeredSceneLayers: SceneLayerConfig[] = [

@@ -90,6 +90,25 @@ button {
   mix-blend-mode: multiply;
 }
 
+.panorama-badge {
+  position: absolute;
+  left: max(16px, env(safe-area-inset-left));
+  top: max(16px, env(safe-area-inset-top));
+  z-index: 9;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  color: #263f45;
+  font-size: 13px;
+  font-weight: 800;
+  background: rgba(255, 252, 239, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 24px rgba(52, 75, 84, 0.16);
+  backdrop-filter: blur(14px);
+}
+
 .hotspot-layer {
   position: absolute;
   inset: 0;

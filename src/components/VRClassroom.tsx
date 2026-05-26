@@ -5,6 +5,7 @@ import { hotspots } from '../config/hotspots';
 import {
   classroomAssets,
   defaultSceneSettings,
+  panoramaCamera,
   requiredLayerSources,
   SceneSettings
 } from '../config/sceneConfig';
@@ -13,14 +14,19 @@ import { useImagePreload } from '../hooks/useImagePreload';
 import { usePointerParallax } from '../hooks/usePointerParallax';
 import { assetExists } from '../utils/assetExists';
 import { clamp } from '../utils/clamp';
+import {
+  isEquirectangularPanorama,
+  loadImageDimensions
+} from '../utils/panoramaDetection';
 import { ControlPanel } from './ControlPanel';
 import { HotspotLayer } from './HotspotLayer';
 import { InfoBubble } from './InfoBubble';
 import { LayeredScene } from './LayeredScene';
 import { LoadingScreen } from './LoadingScreen';
+import { PanoramaScene } from './PanoramaScene';
 import { SingleImageScene } from './SingleImageScene';
 
-type SceneMode = 'detecting' | 'layered' | 'single';
+type SceneMode = 'detecting' | 'panorama' | 'layered' | 'single';
 
 export function VRClassroom() {
   const [sceneMode, setSceneMode] = useState<SceneMode>('detecting');
@@ -35,6 +41,24 @@ export function VRClassroom() {
     let isMounted = true;
 
     const detectAssets = async () => {
+      const panoramaExists = await assetExists(classroomAssets.panorama);
+
+      if (panoramaExists) {
+        try {
+          const dimensions = await loadImageDimensions(classroomAssets.panorama);
+
+          if (isEquirectangularPanorama(dimensions)) {
+            if (isMounted) {
+              setSceneMode('panorama');
+            }
+
+            return;
+          }
+        } catch {
+          // Fall through to the 2.5D scene if the panorama cannot be inspected.
+        }
+      }
+
       const layerResults = await Promise.all(
         requiredLayerSources.map((source) => assetExists(source))
       );
@@ -54,6 +78,10 @@ export function VRClassroom() {
   }, []);
 
   const sceneSources = useMemo(() => {
+    if (sceneMode === 'panorama') {
+      return [classroomAssets.panorama];
+    }
+
     if (sceneMode === 'layered') {
       return requiredLayerSources;
     }
@@ -80,6 +108,7 @@ export function VRClassroom() {
   );
 
   const isLoading = sceneMode === 'detecting' || !preload.isLoaded;
+  const isPanoramaMode = sceneMode === 'panorama';
 
   useEffect(() => {
     if (isLoading) {
@@ -106,9 +135,25 @@ export function VRClassroom() {
   const loadingLabel =
     sceneMode === 'detecting'
       ? '正在检查课堂图层'
-      : sceneMode === 'layered'
+      : sceneMode === 'panorama'
+        ? '正在进入 360 全景教室'
+        : sceneMode === 'layered'
         ? '正在摆放绘本图层'
         : '正在载入原始插画';
+
+  const cameraProps = isPanoramaMode
+    ? {
+        position: [0, 0, 0.1] as [number, number, number],
+        fov: panoramaCamera.fov,
+        near: 0.1,
+        far: panoramaCamera.radius * 3
+      }
+    : {
+        position: [0, 0, 10] as [number, number, number],
+        zoom: 100,
+        near: 0.1,
+        far: 100
+      };
 
   return (
     <main ref={containerRef} className="vr-classroom">
@@ -118,14 +163,9 @@ export function VRClassroom() {
         <>
           <Canvas
             className="classroom-canvas"
-            orthographic
+            orthographic={!isPanoramaMode}
             dpr={[1, 2]}
-            camera={{
-              position: [0, 0, 10],
-              zoom: 100,
-              near: 0.1,
-              far: 100
-            }}
+            camera={cameraProps}
             gl={{
               alpha: true,
               antialias: true
@@ -133,7 +173,13 @@ export function VRClassroom() {
           >
             <color attach="background" args={['#d7f2ec']} />
             <Suspense fallback={null}>
-              {sceneMode === 'layered' ? (
+              {sceneMode === 'panorama' ? (
+                <PanoramaScene
+                  motion={combinedMotion}
+                  settings={settings}
+                  introScale={introScale}
+                />
+              ) : sceneMode === 'layered' ? (
                 <LayeredScene
                   motion={combinedMotion}
                   settings={settings}
@@ -150,16 +196,24 @@ export function VRClassroom() {
           </Canvas>
 
           <div className="scene-vignette" aria-hidden="true" />
-          <HotspotLayer
-            activeHotspotId={activeHotspotId}
-            motion={combinedMotion}
-            settings={settings}
-            onSelect={(hotspot) => setActiveHotspotId(hotspot.id)}
-          />
-          <InfoBubble
-            hotspot={activeHotspot}
-            onClose={() => setActiveHotspotId(null)}
-          />
+          {isPanoramaMode ? (
+            <div className="panorama-badge" aria-label="当前为 360 全景模式">
+              360 全景
+            </div>
+          ) : (
+            <>
+              <HotspotLayer
+                activeHotspotId={activeHotspotId}
+                motion={combinedMotion}
+                settings={settings}
+                onSelect={(hotspot) => setActiveHotspotId(hotspot.id)}
+              />
+              <InfoBubble
+                hotspot={activeHotspot}
+                onClose={() => setActiveHotspotId(null)}
+              />
+            </>
+          )}
           <ControlPanel
             settings={settings}
             deviceOrientation={deviceOrientation}

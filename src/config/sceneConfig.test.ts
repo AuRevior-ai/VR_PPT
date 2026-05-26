@@ -3,6 +3,7 @@ import {
   classroomAssets,
   controlRanges,
   defaultSceneSettings,
+  panoramaCamera,
   requiredLayerSources
 } from './sceneConfig';
 
@@ -10,6 +11,9 @@ describe('sceneConfig', () => {
   it('points to the expected public classroom asset directory', () => {
     expect(classroomAssets.basePath).toBe('/assets/classroom');
     expect(classroomAssets.original).toBe('/assets/classroom/original.png');
+    expect(classroomAssets.panorama).toBe(
+      '/assets/classroom/full_classroom_2to1.png'
+    );
   });
 
   it('treats the five painted layers as required layered-scene assets', () => {
@@ -35,5 +39,13 @@ describe('sceneConfig', () => {
     expect(defaultSceneSettings.lensMode).toBe('concaveWide');
     expect(controlRanges.parallaxStrength.max).toBeGreaterThanOrEqual(2);
     expect(controlRanges.fisheyeStrength.max).toBeGreaterThanOrEqual(0.8);
+  });
+
+  it('defines a 2:1 panorama camera envelope for scheme C', () => {
+    expect(panoramaCamera.fov).toBeGreaterThanOrEqual(70);
+    expect(panoramaCamera.maxYawDegrees).toBeGreaterThanOrEqual(100);
+    expect(panoramaCamera.maxPitchDegrees).toBeLessThanOrEqual(50);
+    expect(panoramaCamera.initialYawDegrees).toBeGreaterThanOrEqual(80);
+    expect(panoramaCamera.initialYawDegrees).toBeLessThanOrEqual(100);
   });
 });

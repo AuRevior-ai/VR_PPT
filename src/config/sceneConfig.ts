@@ -47,9 +47,14 @@ export const classroomAssets = {
 
 export const panoramaCamera = {
   fov: 76,
+  minFov: 44,
+  maxFov: 92,
   initialYawDegrees: 90,
   maxYawDegrees: 115,
   maxPitchDegrees: 42,
+  textureHorizontalScale: -1,
+  yawSensitivity: 0.004,
+  pitchSensitivity: 0.003,
   radius: 500
 } as const;
 

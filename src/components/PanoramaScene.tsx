@@ -1,11 +1,12 @@
 import { useFrame, useLoader, useThree } from '@react-three/fiber';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import {
-  BackSide,
+  FrontSide,
   Group,
   LinearFilter,
   PerspectiveCamera,
   SRGBColorSpace,
+  SphereGeometry,
   TextureLoader
 } from 'three';
 import {
@@ -13,23 +14,28 @@ import {
   panoramaCamera,
   SceneSettings
 } from '../config/sceneConfig';
-import { ParallaxMotion } from '../hooks/usePointerParallax';
-import { clamp } from '../utils/clamp';
+import { PanoramaControls } from '../hooks/usePanoramaControls';
 
 type PanoramaSceneProps = {
-  motion: Pick<ParallaxMotion, 'x' | 'y'>;
-  settings: SceneSettings;
+  controls: PanoramaControls;
+  settings: Pick<SceneSettings, 'autoDriftEnabled'>;
   introScale: number;
 };
 
 export function PanoramaScene({
-  motion,
+  controls,
   settings,
   introScale
 }: PanoramaSceneProps) {
   const groupRef = useRef<Group>(null);
   const texture = useLoader(TextureLoader, classroomAssets.panorama);
   const { camera } = useThree();
+  const geometry = useMemo(() => {
+    const sphereGeometry = new SphereGeometry(panoramaCamera.radius, 128, 80);
+    sphereGeometry.scale(panoramaCamera.textureHorizontalScale, 1, 1);
+
+    return sphereGeometry;
+  }, []);
 
   texture.colorSpace = SRGBColorSpace;
   texture.minFilter = LinearFilter;
@@ -41,7 +47,6 @@ export function PanoramaScene({
 
     if ((camera as PerspectiveCamera).isPerspectiveCamera) {
       const perspectiveCamera = camera as PerspectiveCamera;
-      perspectiveCamera.fov = panoramaCamera.fov;
       perspectiveCamera.near = 0.1;
       perspectiveCamera.far = panoramaCamera.radius * 3;
       perspectiveCamera.updateProjectionMatrix();
@@ -53,29 +58,32 @@ export function PanoramaScene({
       ? Math.sin(clock.elapsedTime * 0.16) * 0.05
       : 0;
     const yaw =
-      -clamp(motion.x + drift, -1, 1) *
-      settings.parallaxStrength *
-      (panoramaCamera.maxYawDegrees * Math.PI) /
-      180;
-    const pitch =
-      clamp(motion.y, -1, 1) *
-      settings.parallaxStrength *
-      (panoramaCamera.maxPitchDegrees * Math.PI) /
-      180;
+      (panoramaCamera.initialYawDegrees * Math.PI) / 180 +
+      controls.yaw +
+      drift;
+    const pitch = controls.pitch;
 
     camera.rotation.y = yaw;
-    camera.rotation.x = clamp(pitch, -Math.PI / 2.8, Math.PI / 2.8);
+    camera.rotation.x = pitch;
+
+    if ((camera as PerspectiveCamera).isPerspectiveCamera) {
+      const perspectiveCamera = camera as PerspectiveCamera;
+      perspectiveCamera.fov = controls.fov;
+      perspectiveCamera.updateProjectionMatrix();
+    }
+
     groupRef.current?.scale.setScalar(introScale);
   });
 
   return (
-    <group
-      ref={groupRef}
-      rotation={[0, (panoramaCamera.initialYawDegrees * Math.PI) / 180, 0]}
-    >
+    <group ref={groupRef}>
       <mesh>
-        <sphereGeometry args={[panoramaCamera.radius, 96, 64]} />
-        <meshBasicMaterial map={texture} side={BackSide} />
+        <primitive object={geometry} attach="geometry" />
+        <meshBasicMaterial
+          map={texture}
+          side={FrontSide}
+          toneMapped={false}
+        />
       </mesh>
     </group>
   );

@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber';
 import { gsap } from 'gsap';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { NoToneMapping, SRGBColorSpace } from 'three';
 import { hotspots } from '../config/hotspots';
 import {
   classroomAssets,
@@ -11,6 +12,7 @@ import {
 } from '../config/sceneConfig';
 import { useDeviceOrientation } from '../hooks/useDeviceOrientation';
 import { useImagePreload } from '../hooks/useImagePreload';
+import { usePanoramaControls } from '../hooks/usePanoramaControls';
 import { usePointerParallax } from '../hooks/usePointerParallax';
 import { assetExists } from '../utils/assetExists';
 import { clamp } from '../utils/clamp';
@@ -35,6 +37,7 @@ export function VRClassroom() {
   const [introScale, setIntroScale] = useState(1.08);
   const introState = useRef({ scale: 1.08 });
   const { containerRef, motion } = usePointerParallax();
+  const panoramaControls = usePanoramaControls(containerRef);
   const deviceOrientation = useDeviceOrientation();
 
   useEffect(() => {
@@ -167,15 +170,19 @@ export function VRClassroom() {
             dpr={[1, 2]}
             camera={cameraProps}
             gl={{
-              alpha: true,
+              alpha: !isPanoramaMode,
               antialias: true
+            }}
+            onCreated={({ gl }) => {
+              gl.outputColorSpace = SRGBColorSpace;
+              gl.toneMapping = NoToneMapping;
             }}
           >
             <color attach="background" args={['#d7f2ec']} />
             <Suspense fallback={null}>
               {sceneMode === 'panorama' ? (
                 <PanoramaScene
-                  motion={combinedMotion}
+                  controls={panoramaControls}
                   settings={settings}
                   introScale={introScale}
                 />
@@ -195,7 +202,9 @@ export function VRClassroom() {
             </Suspense>
           </Canvas>
 
-          <div className="scene-vignette" aria-hidden="true" />
+          {!isPanoramaMode ? (
+            <div className="scene-vignette" aria-hidden="true" />
+          ) : null}
           {isPanoramaMode ? (
             <div className="panorama-badge" aria-label="当前为 360 全景模式">
               360 全景

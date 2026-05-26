@@ -47,5 +47,8 @@ describe('sceneConfig', () => {
     expect(panoramaCamera.maxPitchDegrees).toBeLessThanOrEqual(50);
     expect(panoramaCamera.initialYawDegrees).toBeGreaterThanOrEqual(80);
     expect(panoramaCamera.initialYawDegrees).toBeLessThanOrEqual(100);
+    expect(panoramaCamera.minFov).toBeLessThan(panoramaCamera.fov);
+    expect(panoramaCamera.maxFov).toBeGreaterThan(panoramaCamera.fov);
+    expect(panoramaCamera.textureHorizontalScale).toBe(-1);
   });
 });

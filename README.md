@@ -50,9 +50,9 @@ npm run build
 - `fisheyeStrength`：默认凹面弯曲强度。
 - `viewRotationMaxDegrees`：方案 A 下的最大伪旋转角度，默认是适合单张图的安全范围。
 - `lensMode`：默认 `concaveWide`，保留 `convexFisheye` 作为后续对比模式。
-- `fisheyeEnabled`、`autoDriftEnabled`：默认开关。
+- `fisheyeEnabled`、`autoDriftEnabled`：默认开关，其中漂移默认关闭。
 
-页面右下角控制面板也可以实时调节。
+页面右下角镜头台保留本地全景图上传入口。
 
 当前方案 C 初版会优先检测 `full_classroom_2to1.png` 是否存在，并确认图片接近 2:1。通过后会把图片贴到 Three.js 球体内壁，用透视相机在球心浏览；如果没有合格全景图，才回退到方案 A 的分层/单图凹面广角。
 

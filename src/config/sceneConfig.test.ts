@@ -37,6 +37,7 @@ describe('sceneConfig', () => {
 
   it('defaults to concave wide-angle rather than convex fisheye', () => {
     expect(defaultSceneSettings.lensMode).toBe('concaveWide');
+    expect(defaultSceneSettings.autoDriftEnabled).toBe(false);
     expect(controlRanges.parallaxStrength.max).toBeGreaterThanOrEqual(2);
     expect(controlRanges.fisheyeStrength.max).toBeGreaterThanOrEqual(0.8);
   });

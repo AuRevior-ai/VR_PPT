@@ -288,10 +288,7 @@ export function VRClassroom() {
             </>
           )}
           <ControlPanel
-            settings={settings}
-            deviceOrientation={deviceOrientation}
             uploadError={uploadError}
-            onChange={setSettings}
             onPanoramaUpload={(file) => void handlePanoramaUpload(file)}
           />
         </>

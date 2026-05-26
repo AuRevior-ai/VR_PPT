@@ -116,7 +116,7 @@ export const requiredLayerSources = layeredSceneLayers.map((layer) => layer.src)
 export const defaultSceneSettings: SceneSettings = {
   lensMode: 'concaveWide',
   fisheyeEnabled: true,
-  autoDriftEnabled: true,
+  autoDriftEnabled: false,
   parallaxStrength: 1.05,
   fisheyeStrength: 0.42,
   viewRotationMaxDegrees: 34

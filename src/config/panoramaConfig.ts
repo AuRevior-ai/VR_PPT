@@ -1,5 +1,4 @@
-export const defaultPanoramaAsset =
-  '/assets/classroom/full_classroom_2to1.png';
+export const defaultPanoramaAsset = `${import.meta.env.BASE_URL}assets/classroom/full_classroom_2to1.png`;
 
 export const defaultPanoramaSettings = {
   autoDriftEnabled: false

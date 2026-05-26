@@ -8,7 +8,7 @@ import {
 describe('panoramaConfig', () => {
   it('keeps the app focused on a single default 2:1 panorama asset', () => {
     expect(defaultPanoramaAsset).toBe(
-      '/assets/classroom/full_classroom_2to1.png'
+      `${import.meta.env.BASE_URL}assets/classroom/full_classroom_2to1.png`
     );
   });
 

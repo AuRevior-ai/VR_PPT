@@ -11,6 +11,8 @@
 - 有分层素材时：放 `bg_wall.png`、`teacher_podium.png`、`desks_students_mid.png`、`students_foreground.png`、`overlays.png`，项目会优先使用分层场景。
 - `depth_map.png` 已预留路径，当前 MVP 暂未参与渲染。
 
+界面右下角也可以临时上传本地 2:1 图片预览全景效果；上传内容只在本次浏览会话生效，刷新后恢复默认素材。
+
 ## 运行
 
 ```bash

@@ -1,6 +1,13 @@
 import { Canvas } from '@react-three/fiber';
 import { gsap } from 'gsap';
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import { NoToneMapping, SRGBColorSpace } from 'three';
 import { hotspots } from '../config/hotspots';
 import {
@@ -20,6 +27,7 @@ import {
   isEquirectangularPanorama,
   loadImageDimensions
 } from '../utils/panoramaDetection';
+import { validatePanoramaUploadDimensions } from '../utils/panoramaUpload';
 import { ControlPanel } from './ControlPanel';
 import { HotspotLayer } from './HotspotLayer';
 import { InfoBubble } from './InfoBubble';
@@ -33,12 +41,67 @@ type SceneMode = 'detecting' | 'panorama' | 'layered' | 'single';
 export function VRClassroom() {
   const [sceneMode, setSceneMode] = useState<SceneMode>('detecting');
   const [settings, setSettings] = useState<SceneSettings>(defaultSceneSettings);
+  const [uploadedPanoramaSrc, setUploadedPanoramaSrc] = useState<string | null>(
+    null
+  );
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [activeHotspotId, setActiveHotspotId] = useState<string | null>(null);
   const [introScale, setIntroScale] = useState(1.08);
   const introState = useRef({ scale: 1.08 });
+  const uploadedPanoramaSrcRef = useRef<string | null>(null);
+  const uploadSequenceRef = useRef(0);
   const { containerRef, motion } = usePointerParallax();
   const panoramaControls = usePanoramaControls(containerRef);
   const deviceOrientation = useDeviceOrientation();
+
+  const handlePanoramaUpload = useCallback(async (file: File) => {
+    const requestId = uploadSequenceRef.current + 1;
+    uploadSequenceRef.current = requestId;
+    const nextSrc = URL.createObjectURL(file);
+
+    try {
+      const dimensions = await loadImageDimensions(nextSrc);
+
+      if (uploadSequenceRef.current !== requestId) {
+        URL.revokeObjectURL(nextSrc);
+        return;
+      }
+
+      const validation = validatePanoramaUploadDimensions(dimensions);
+
+      if (!validation.ok) {
+        URL.revokeObjectURL(nextSrc);
+        setUploadError(validation.message);
+        return;
+      }
+
+      const previousSrc = uploadedPanoramaSrcRef.current;
+      uploadedPanoramaSrcRef.current = nextSrc;
+      setUploadedPanoramaSrc(nextSrc);
+      setUploadError(null);
+      setSceneMode('panorama');
+
+      if (previousSrc) {
+        URL.revokeObjectURL(previousSrc);
+      }
+    } catch {
+      URL.revokeObjectURL(nextSrc);
+
+      if (uploadSequenceRef.current === requestId) {
+        setUploadError('无法读取图片尺寸');
+      }
+    }
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (uploadedPanoramaSrcRef.current) {
+        URL.revokeObjectURL(uploadedPanoramaSrcRef.current);
+        uploadedPanoramaSrcRef.current = null;
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -51,7 +114,7 @@ export function VRClassroom() {
           const dimensions = await loadImageDimensions(classroomAssets.panorama);
 
           if (isEquirectangularPanorama(dimensions)) {
-            if (isMounted) {
+            if (isMounted && !uploadedPanoramaSrcRef.current) {
               setSceneMode('panorama');
             }
 
@@ -66,7 +129,7 @@ export function VRClassroom() {
         requiredLayerSources.map((source) => assetExists(source))
       );
 
-      if (!isMounted) {
+      if (!isMounted || uploadedPanoramaSrcRef.current) {
         return;
       }
 
@@ -82,7 +145,7 @@ export function VRClassroom() {
 
   const sceneSources = useMemo(() => {
     if (sceneMode === 'panorama') {
-      return [classroomAssets.panorama];
+      return [uploadedPanoramaSrc ?? classroomAssets.panorama];
     }
 
     if (sceneMode === 'layered') {
@@ -94,7 +157,7 @@ export function VRClassroom() {
     }
 
     return [];
-  }, [sceneMode]);
+  }, [sceneMode, uploadedPanoramaSrc]);
 
   const preload = useImagePreload(sceneSources);
   const activeHotspot = useMemo(
@@ -183,6 +246,7 @@ export function VRClassroom() {
               {sceneMode === 'panorama' ? (
                 <PanoramaScene
                   controls={panoramaControls}
+                  imageSrc={uploadedPanoramaSrc ?? classroomAssets.panorama}
                   settings={settings}
                   introScale={introScale}
                 />
@@ -226,7 +290,9 @@ export function VRClassroom() {
           <ControlPanel
             settings={settings}
             deviceOrientation={deviceOrientation}
+            uploadError={uploadError}
             onChange={setSettings}
+            onPanoramaUpload={(file) => void handlePanoramaUpload(file)}
           />
         </>
       )}

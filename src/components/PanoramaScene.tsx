@@ -10,7 +10,6 @@ import {
   TextureLoader
 } from 'three';
 import {
-  classroomAssets,
   panoramaCamera,
   SceneSettings
 } from '../config/sceneConfig';
@@ -18,17 +17,19 @@ import { PanoramaControls } from '../hooks/usePanoramaControls';
 
 type PanoramaSceneProps = {
   controls: PanoramaControls;
+  imageSrc: string;
   settings: Pick<SceneSettings, 'autoDriftEnabled'>;
   introScale: number;
 };
 
 export function PanoramaScene({
   controls,
+  imageSrc,
   settings,
   introScale
 }: PanoramaSceneProps) {
   const groupRef = useRef<Group>(null);
-  const texture = useLoader(TextureLoader, classroomAssets.panorama);
+  const texture = useLoader(TextureLoader, imageSrc);
   const { camera } = useThree();
   const geometry = useMemo(() => {
     const sphereGeometry = new SphereGeometry(panoramaCamera.radius, 128, 80);

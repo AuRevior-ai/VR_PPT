@@ -4,13 +4,17 @@ import { DeviceOrientationState } from '../hooks/useDeviceOrientation';
 type ControlPanelProps = {
   settings: SceneSettings;
   deviceOrientation: DeviceOrientationState;
+  uploadError: string | null;
   onChange: (settings: SceneSettings) => void;
+  onPanoramaUpload: (file: File) => void;
 };
 
 export function ControlPanel({
   settings,
   deviceOrientation,
-  onChange
+  uploadError,
+  onChange,
+  onPanoramaUpload
 }: ControlPanelProps) {
   const update = <Key extends keyof SceneSettings>(
     key: Key,
@@ -27,6 +31,33 @@ export function ControlPanel({
       <div className="control-panel-header">
         <span>镜头台</span>
       </div>
+
+      <label className="upload-row">
+        <span>全景图</span>
+        <span className="upload-button" aria-hidden="true">
+          上传
+        </span>
+        <input
+          className="upload-input"
+          type="file"
+          accept="image/*"
+          aria-label="上传 2:1 全景图"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = '';
+
+            if (file) {
+              onPanoramaUpload(file);
+            }
+          }}
+        />
+      </label>
+
+      {uploadError ? (
+        <p className="upload-error" role="status">
+          {uploadError}
+        </p>
+      ) : null}
 
       <label className="switch-row">
         <span>凹面</span>

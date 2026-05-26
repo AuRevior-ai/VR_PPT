@@ -348,7 +348,8 @@ button {
 }
 
 .switch-row,
-.range-row {
+.range-row,
+.upload-row {
   display: grid;
   grid-template-columns: 52px 1fr;
   align-items: center;
@@ -357,6 +358,46 @@ button {
   color: #405963;
   font-size: 13px;
   font-weight: 700;
+}
+
+.upload-row {
+  position: relative;
+  grid-column: 1 / -1;
+  cursor: pointer;
+}
+
+.upload-button {
+  display: inline-grid;
+  place-items: center;
+  min-height: 30px;
+  border-radius: 8px;
+  color: #273f46;
+  font-weight: 800;
+  background: linear-gradient(135deg, rgba(255, 211, 107, 0.92), rgba(139, 198, 237, 0.74));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.72);
+}
+
+.upload-row:hover .upload-button,
+.upload-row:focus-within .upload-button {
+  background: linear-gradient(135deg, var(--sun), rgba(139, 198, 237, 0.92));
+}
+
+.upload-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.upload-error {
+  grid-column: 1 / -1;
+  margin: -3px 0 0;
+  color: var(--coral-deep);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
 .switch-row input {
@@ -496,7 +537,8 @@ button {
   }
 
   .switch-row,
-  .range-row {
+  .range-row,
+  .upload-row {
     grid-template-columns: 42px minmax(0, 1fr);
   }
 

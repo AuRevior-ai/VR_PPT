@@ -73,8 +73,8 @@ export function VRClassroom() {
 
   const combinedMotion = useMemo(
     () => ({
-      x: clamp(motion.x + deviceOrientation.x * 0.28, -1.15, 1.15),
-      y: clamp(motion.y + deviceOrientation.y * 0.22, -1.15, 1.15)
+      x: clamp(motion.x + deviceOrientation.x * 0.38, -1.35, 1.35),
+      y: clamp(motion.y + deviceOrientation.y * 0.3, -1.25, 1.25)
     }),
     [deviceOrientation.x, deviceOrientation.y, motion.x, motion.y]
   );

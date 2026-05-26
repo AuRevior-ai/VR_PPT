@@ -1,6 +1,6 @@
 # 幼儿教育绘本场景 2.5D 类 VR Demo
 
-这是一个纯前端 MVP：Vite + React + TypeScript + Three.js，通过分层平面、轻微视差、鱼眼 shader、热点弹窗和控制面板，把课堂插画做成“伪 VR / 类 3D / 绘本广角镜头”的互动网页。
+这是一个纯前端 MVP：Vite + React + TypeScript + Three.js，通过分层平面、轻微视差、凹面广角 shader、热点弹窗和控制面板，把课堂插画做成“伪 VR / 类 3D / 绘本广角镜头”的互动网页。
 
 ## 放置图片
 
@@ -39,15 +39,19 @@ npm run build
 - `width`、`height` 是可点击区域大小。
 - `title`、`description`、`details` 是弹窗内容。
 
-## 调整鱼眼和视差
+## 调整凹面广角和视差
 
 默认值在 `src/config/sceneConfig.ts` 的 `defaultSceneSettings`：
 
 - `parallaxStrength`：默认视差强度。
-- `fisheyeStrength`：默认鱼眼强度。
+- `fisheyeStrength`：默认凹面弯曲强度。
+- `viewRotationMaxDegrees`：方案 A 下的最大伪旋转角度，默认是适合单张图的安全范围。
+- `lensMode`：默认 `concaveWide`，保留 `convexFisheye` 作为后续对比模式。
 - `fisheyeEnabled`、`autoDriftEnabled`：默认开关。
 
 页面右下角控制面板也可以实时调节。
+
+当前方案 A 仍然使用原图或分层图做“凹面广角”模拟，不会生成真实 90 度侧墙内容。若要真实 90 度以上视角，需要补充更宽的 180 度课堂图或左/中/右多视角素材。
 
 ## 接入真实幼儿教育内容
 

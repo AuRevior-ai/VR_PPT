@@ -6,6 +6,8 @@ export type SceneLayerId =
   | 'overlays'
   | 'original';
 
+export type LensMode = 'concaveWide' | 'convexFisheye';
+
 export type SceneLayerConfig = {
   id: SceneLayerId;
   name: string;
@@ -17,10 +19,12 @@ export type SceneLayerConfig = {
 };
 
 export type SceneSettings = {
+  lensMode: LensMode;
   fisheyeEnabled: boolean;
   autoDriftEnabled: boolean;
   parallaxStrength: number;
   fisheyeStrength: number;
+  viewRotationMaxDegrees: number;
 };
 
 const basePath = '/assets/classroom';
@@ -47,7 +51,7 @@ export const layeredSceneLayers: SceneLayerConfig[] = [
     src: classroomAssets.layers.bg_wall,
     depth: -0.12,
     parallaxFactor: 0.16,
-    scale: 1.1
+    scale: 1.24
   },
   {
     id: 'teacher_podium',
@@ -55,7 +59,7 @@ export const layeredSceneLayers: SceneLayerConfig[] = [
     src: classroomAssets.layers.teacher_podium,
     depth: -0.04,
     parallaxFactor: 0.38,
-    scale: 1.12
+    scale: 1.25
   },
   {
     id: 'desks_students_mid',
@@ -63,7 +67,7 @@ export const layeredSceneLayers: SceneLayerConfig[] = [
     src: classroomAssets.layers.desks_students_mid,
     depth: 0.03,
     parallaxFactor: 0.62,
-    scale: 1.14
+    scale: 1.28
   },
   {
     id: 'students_foreground',
@@ -71,7 +75,7 @@ export const layeredSceneLayers: SceneLayerConfig[] = [
     src: classroomAssets.layers.students_foreground,
     depth: 0.1,
     parallaxFactor: 0.92,
-    scale: 1.17
+    scale: 1.32
   },
   {
     id: 'overlays',
@@ -79,7 +83,7 @@ export const layeredSceneLayers: SceneLayerConfig[] = [
     src: classroomAssets.layers.overlays,
     depth: 0.14,
     parallaxFactor: 0.52,
-    scale: 1.13
+    scale: 1.26
   }
 ];
 
@@ -89,28 +93,30 @@ export const singleImageLayer: SceneLayerConfig = {
   src: classroomAssets.original,
   depth: 0,
   parallaxFactor: 0.48,
-  scale: 1.16
+  scale: 1.32
 };
 
 export const requiredLayerSources = layeredSceneLayers.map((layer) => layer.src);
 
 // Gentle defaults: enough motion to feel spatial, low enough for young users.
 export const defaultSceneSettings: SceneSettings = {
+  lensMode: 'concaveWide',
   fisheyeEnabled: true,
   autoDriftEnabled: true,
-  parallaxStrength: 0.78,
-  fisheyeStrength: 0.24
+  parallaxStrength: 1.05,
+  fisheyeStrength: 0.42,
+  viewRotationMaxDegrees: 34
 };
 
 export const controlRanges = {
   parallaxStrength: {
     min: 0,
-    max: 1.4,
+    max: 2.2,
     step: 0.05
   },
   fisheyeStrength: {
     min: 0,
-    max: 0.6,
+    max: 0.9,
     step: 0.02
   }
 } as const;

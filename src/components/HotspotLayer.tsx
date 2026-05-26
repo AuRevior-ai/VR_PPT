@@ -15,8 +15,8 @@ export function HotspotLayer({
   settings,
   onSelect
 }: HotspotLayerProps) {
-  const offsetX = -motion.x * settings.parallaxStrength * 18;
-  const offsetY = motion.y * settings.parallaxStrength * 12;
+  const offsetX = -motion.x * settings.parallaxStrength * 34;
+  const offsetY = motion.y * settings.parallaxStrength * 20;
 
   return (
     <div

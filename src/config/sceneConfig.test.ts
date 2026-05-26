@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   classroomAssets,
+  controlRanges,
   defaultSceneSettings,
   requiredLayerSources
 } from './sceneConfig';
@@ -23,8 +24,16 @@ describe('sceneConfig', () => {
 
   it('keeps default controls in a gentle MVP range', () => {
     expect(defaultSceneSettings.parallaxStrength).toBeGreaterThan(0);
-    expect(defaultSceneSettings.parallaxStrength).toBeLessThanOrEqual(1.4);
+    expect(defaultSceneSettings.parallaxStrength).toBeLessThanOrEqual(2.2);
     expect(defaultSceneSettings.fisheyeStrength).toBeGreaterThan(0);
-    expect(defaultSceneSettings.fisheyeStrength).toBeLessThanOrEqual(0.6);
+    expect(defaultSceneSettings.fisheyeStrength).toBeLessThanOrEqual(0.9);
+    expect(defaultSceneSettings.viewRotationMaxDegrees).toBeGreaterThanOrEqual(28);
+    expect(defaultSceneSettings.viewRotationMaxDegrees).toBeLessThanOrEqual(40);
+  });
+
+  it('defaults to concave wide-angle rather than convex fisheye', () => {
+    expect(defaultSceneSettings.lensMode).toBe('concaveWide');
+    expect(controlRanges.parallaxStrength.max).toBeGreaterThanOrEqual(2);
+    expect(controlRanges.fisheyeStrength.max).toBeGreaterThanOrEqual(0.8);
   });
 });

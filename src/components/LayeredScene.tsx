@@ -71,9 +71,22 @@ export function SceneImagePlane({
     () => ({
       uTexture: { value: texture },
       uStrength: { value: settings.fisheyeEnabled ? settings.fisheyeStrength : 0 },
+      uLensMode: { value: settings.lensMode === 'concaveWide' ? 1 : 0 },
+      uConcaveStrength: {
+        value:
+          settings.fisheyeEnabled && settings.lensMode === 'concaveWide'
+            ? settings.fisheyeStrength
+            : 0
+      },
       uOpacity: { value: layer.opacity ?? 1 }
     }),
-    [layer.opacity, settings.fisheyeEnabled, settings.fisheyeStrength, texture]
+    [
+      layer.opacity,
+      settings.fisheyeEnabled,
+      settings.fisheyeStrength,
+      settings.lensMode,
+      texture
+    ]
   );
 
   useFrame(({ clock }) => {
@@ -92,21 +105,29 @@ export function SceneImagePlane({
       : 0;
     const viewX = motion.x + driftX;
     const viewY = motion.y + driftY;
-    const maxX = viewport.width * 0.075;
-    const maxY = viewport.height * 0.06;
+    const maxX = viewport.width * 0.13;
+    const maxY = viewport.height * 0.095;
+    const rotationRange = (settings.viewRotationMaxDegrees * Math.PI) / 180;
+    const rotationWeight = 0.24 + layer.parallaxFactor * 0.52;
 
     // Different parallax factors make flat planes feel like foreground,
     // midground, and background without requiring full 3D modeling.
     mesh.position.x = -viewX * settings.parallaxStrength * layer.parallaxFactor * maxX;
     mesh.position.y = viewY * settings.parallaxStrength * layer.parallaxFactor * maxY;
     mesh.position.z = layer.depth;
-    mesh.rotation.x = viewY * settings.parallaxStrength * layer.parallaxFactor * 0.018;
-    mesh.rotation.y = viewX * settings.parallaxStrength * layer.parallaxFactor * 0.018;
+    mesh.rotation.x = viewY * settings.parallaxStrength * rotationRange * rotationWeight * 0.28;
+    mesh.rotation.y = viewX * settings.parallaxStrength * rotationRange * rotationWeight;
     mesh.scale.setScalar(introScale);
 
     material.uniforms.uStrength.value = settings.fisheyeEnabled
       ? settings.fisheyeStrength
       : 0;
+    material.uniforms.uLensMode.value =
+      settings.lensMode === 'concaveWide' ? 1 : 0;
+    material.uniforms.uConcaveStrength.value =
+      settings.fisheyeEnabled && settings.lensMode === 'concaveWide'
+        ? settings.fisheyeStrength
+        : 0;
     material.uniforms.uOpacity.value = layer.opacity ?? 1;
   });
 

@@ -29,7 +29,7 @@ export function ControlPanel({
       </div>
 
       <label className="switch-row">
-        <span>鱼眼</span>
+        <span>凹面</span>
         <input
           type="checkbox"
           checked={settings.fisheyeEnabled}
@@ -61,7 +61,7 @@ export function ControlPanel({
       </label>
 
       <label className="range-row">
-        <span>广角</span>
+        <span>弯曲</span>
         <input
           type="range"
           min={controlRanges.fisheyeStrength.min}

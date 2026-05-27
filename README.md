@@ -12,6 +12,22 @@ public/assets/classroom/full_classroom_2to1.png
 
 图片需要接近 2:1 比例。页面右下角也可以临时上传本地 2:1 图片预览全景效果；上传内容只在本次浏览会话生效，刷新后恢复默认素材。
 
+## 分享远程素材
+
+跨设备分享需要先把图片放到公开可访问的线上地址。当前素材仓库为：
+
+```text
+https://aurevior-ai.github.io/VR_PPT_assets/
+```
+
+主页面支持通过 `source` 参数加载远程 2:1 全景图，例如：
+
+```text
+https://aurevior-ai.github.io/VR_PPT/?source=/VR_PPT_assets/playground.png
+```
+
+`source` 支持 `https://` 图片链接，也支持同域路径如 `/VR_PPT_assets/school_gate.png`。浏览器不能从 GitHub Pages 读取 `D:\...` 或 `file://...` 这类本机路径。
+
 ## 运行
 
 ```bash

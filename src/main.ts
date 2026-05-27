@@ -27,6 +27,7 @@ import {
   applyPanoramaWheel,
   PanoramaAngles
 } from './utils/panoramaControls';
+import { resolvePanoramaSource } from './utils/panoramaSource';
 
 type PanoramaControls = PanoramaAngles & {
   fov: number;
@@ -110,6 +111,7 @@ let panoramaMesh: Mesh<SphereGeometry, MeshBasicMaterial> | null = null;
 renderer.outputColorSpace = SRGBColorSpace;
 renderer.toneMapping = NoToneMapping;
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+textureLoader.setCrossOrigin('anonymous');
 viewer.prepend(renderer.domElement);
 renderer.domElement.className = 'classroom-canvas';
 
@@ -168,8 +170,8 @@ function applyTexture(texture: Texture) {
   previousTexture?.dispose();
 }
 
-async function showPanorama(src: string) {
-  setLoading(true);
+async function showPanorama(src: string, label = '正在载入全景图') {
+  setLoading(true, label);
   const dimensions = await loadImageDimensions(src);
   const validation = validatePanoramaUploadDimensions(dimensions);
 
@@ -312,7 +314,38 @@ window.addEventListener('beforeunload', () => {
 });
 
 resize();
-void showPanorama(defaultPanoramaAsset).catch((error) => {
+async function showInitialPanorama() {
+  const resolvedSource = resolvePanoramaSource(
+    window.location.search,
+    defaultPanoramaAsset,
+    window.location.href
+  );
+
+  if (!resolvedSource.ok) {
+    setUploadError(resolvedSource.message);
+    await showPanorama(defaultPanoramaAsset);
+    return;
+  }
+
+  try {
+    await showPanorama(
+      resolvedSource.src,
+      resolvedSource.fromQuery ? '正在载入分享全景图' : '正在载入全景图'
+    );
+  } catch (error) {
+    if (resolvedSource.fromQuery) {
+      setUploadError(
+        error instanceof Error ? error.message : '无法读取分享全景图'
+      );
+      await showPanorama(defaultPanoramaAsset);
+      return;
+    }
+
+    throw error;
+  }
+}
+
+void showInitialPanorama().catch((error) => {
   setLoading(false);
   setUploadError(error instanceof Error ? error.message : '无法读取默认全景图');
 });

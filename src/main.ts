@@ -84,6 +84,8 @@ function queryRequired<ElementType extends Element>(selector: string) {
 const viewer = queryRequired<HTMLElement>('.panorama-viewer');
 const loading = queryRequired<HTMLElement>('[data-loading]');
 const loadingLabel = queryRequired<HTMLElement>('[data-loading-label]');
+const panoramaBadge = queryRequired<HTMLElement>('.panorama-badge');
+const controlPanel = queryRequired<HTMLElement>('.control-panel');
 const uploadInput = queryRequired<HTMLInputElement>('[data-upload]');
 const uploadError = queryRequired<HTMLElement>('[data-upload-error]');
 
@@ -126,6 +128,11 @@ function setLoading(isLoading: boolean, label = '正在载入全景图') {
 function setUploadError(message: string | null) {
   uploadError.textContent = message ?? '';
   uploadError.hidden = !message;
+}
+
+function setPanoramaChromeHidden(isHidden: boolean) {
+  panoramaBadge.hidden = isHidden;
+  controlPanel.hidden = isHidden;
 }
 
 function configureTexture(texture: Texture) {
@@ -322,10 +329,13 @@ async function showInitialPanorama() {
   );
 
   if (!resolvedSource.ok) {
+    setPanoramaChromeHidden(false);
     setUploadError(resolvedSource.message);
     await showPanorama(defaultPanoramaAsset);
     return;
   }
+
+  setPanoramaChromeHidden(resolvedSource.hideChrome);
 
   try {
     await showPanorama(
@@ -334,6 +344,7 @@ async function showInitialPanorama() {
     );
   } catch (error) {
     if (resolvedSource.fromQuery) {
+      setPanoramaChromeHidden(false);
       setUploadError(
         error instanceof Error ? error.message : '无法读取分享全景图'
       );

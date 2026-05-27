@@ -3,6 +3,7 @@ export type PanoramaSourceResolution =
       ok: true;
       src: string;
       fromQuery: boolean;
+      hideChrome: boolean;
     }
   | {
       ok: false;
@@ -36,7 +37,8 @@ export function resolvePanoramaSource(
     return {
       ok: true,
       src: fallbackSrc,
-      fromQuery: false
+      fromQuery: false,
+      hideChrome: false
     };
   }
 
@@ -75,6 +77,7 @@ export function resolvePanoramaSource(
   return {
     ok: true,
     src: sourceUrl.href,
-    fromQuery: true
+    fromQuery: true,
+    hideChrome: true
   };
 }

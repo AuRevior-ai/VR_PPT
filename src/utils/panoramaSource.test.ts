@@ -9,7 +9,8 @@ describe('resolvePanoramaSource', () => {
     expect(resolvePanoramaSource('', fallbackSrc, baseUrl)).toEqual({
       ok: true,
       src: fallbackSrc,
-      fromQuery: false
+      fromQuery: false,
+      hideChrome: false
     });
   });
 
@@ -23,7 +24,8 @@ describe('resolvePanoramaSource', () => {
     ).toEqual({
       ok: true,
       src: 'https://aurevior-ai.github.io/VR_PPT_assets/playground.png',
-      fromQuery: true
+      fromQuery: true,
+      hideChrome: true
     });
   });
 
@@ -37,7 +39,8 @@ describe('resolvePanoramaSource', () => {
     ).toEqual({
       ok: true,
       src: 'https://aurevior-ai.github.io/VR_PPT_assets/school_gate.png',
-      fromQuery: true
+      fromQuery: true,
+      hideChrome: true
     });
   });
 

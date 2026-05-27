@@ -1,0 +1,197 @@
+:root {
+  color-scheme: dark;
+  --chrome: rgba(10, 18, 20, 0.34);
+  --chrome-strong: rgba(10, 18, 20, 0.58);
+  --line: rgba(255, 255, 255, 0.46);
+  --text: #fff7df;
+  font-family:
+    "Microsoft YaHei",
+    "PingFang SC",
+    "Noto Sans SC",
+    "Source Han Sans SC",
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#courseware {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  background: #000;
+}
+
+button {
+  font: inherit;
+}
+
+.courseware-stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #000;
+  color: var(--text);
+  touch-action: none;
+  user-select: none;
+}
+
+.courseware-stage:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  background: #000;
+  transition: opacity 220ms ease;
+}
+
+.slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.slide-media {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: cover;
+  background: #000;
+}
+
+.slide-hotspot {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+}
+
+.vr-layer {
+  position: absolute;
+  inset: 0;
+  background: #000;
+}
+
+.vr-layer canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.vr-status {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  min-width: 168px;
+  transform: translate(-50%, -50%);
+  padding: 14px 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.36);
+  background: rgba(0, 0, 0, 0.36);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 800;
+  text-align: center;
+  backdrop-filter: blur(12px);
+}
+
+.vr-status[hidden] {
+  display: none;
+}
+
+.nav-button {
+  position: absolute;
+  top: 50%;
+  z-index: 12;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--chrome);
+  color: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.nav-button:hover,
+.nav-button:focus-visible {
+  background: var(--chrome-strong);
+  outline: 2px solid rgba(255, 255, 255, 0.42);
+  outline-offset: 3px;
+}
+
+.nav-button[hidden] {
+  display: none;
+}
+
+.nav-button svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nav-prev {
+  left: max(18px, env(safe-area-inset-left));
+}
+
+.nav-next {
+  right: max(18px, env(safe-area-inset-right));
+}
+
+.blank-interaction-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  .nav-button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .nav-prev {
+    left: max(12px, env(safe-area-inset-left));
+  }
+
+  .nav-next {
+    right: max(12px, env(safe-area-inset-right));
+  }
+}

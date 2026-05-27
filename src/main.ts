@@ -27,6 +27,10 @@ import {
   applyPanoramaWheel,
   PanoramaAngles
 } from './utils/panoramaControls';
+import {
+  getActiveFullscreenElement,
+  requestSharedPanoramaFullscreen
+} from './utils/panoramaFullscreen';
 import { resolvePanoramaSource } from './utils/panoramaSource';
 
 type PanoramaControls = PanoramaAngles & {
@@ -108,6 +112,7 @@ const lastPointer = { x: 0, y: 0 };
 
 let activeUploadedSrc: string | null = null;
 let uploadSequence = 0;
+let sharedPanoramaFullscreenEnabled = false;
 let panoramaMesh: Mesh<SphereGeometry, MeshBasicMaterial> | null = null;
 
 renderer.outputColorSpace = SRGBColorSpace;
@@ -133,6 +138,14 @@ function setUploadError(message: string | null) {
 function setPanoramaChromeHidden(isHidden: boolean) {
   panoramaBadge.hidden = isHidden;
   controlPanel.hidden = isHidden;
+}
+
+function requestSharedFullscreenOnInteraction() {
+  void requestSharedPanoramaFullscreen(
+    viewer,
+    sharedPanoramaFullscreenEnabled,
+    getActiveFullscreenElement(document)
+  ).catch(() => undefined);
 }
 
 function configureTexture(texture: Texture) {
@@ -227,6 +240,7 @@ viewer.addEventListener('pointerdown', (event) => {
     return;
   }
 
+  requestSharedFullscreenOnInteraction();
   lastPointer.x = event.clientX;
   lastPointer.y = event.clientY;
   viewer.setPointerCapture?.(event.pointerId);
@@ -270,6 +284,7 @@ viewer.addEventListener(
       return;
     }
 
+    requestSharedFullscreenOnInteraction();
     event.preventDefault();
     controls.fov = applyPanoramaWheel(controls.fov, event.deltaY, {
       minFov: panoramaCamera.minFov,
@@ -314,6 +329,7 @@ uploadInput.addEventListener('change', async () => {
 });
 
 window.addEventListener('resize', resize);
+window.addEventListener('keydown', requestSharedFullscreenOnInteraction);
 window.addEventListener('beforeunload', () => {
   if (activeUploadedSrc) {
     URL.revokeObjectURL(activeUploadedSrc);
@@ -329,12 +345,14 @@ async function showInitialPanorama() {
   );
 
   if (!resolvedSource.ok) {
+    sharedPanoramaFullscreenEnabled = false;
     setPanoramaChromeHidden(false);
     setUploadError(resolvedSource.message);
     await showPanorama(defaultPanoramaAsset);
     return;
   }
 
+  sharedPanoramaFullscreenEnabled = resolvedSource.hideChrome;
   setPanoramaChromeHidden(resolvedSource.hideChrome);
 
   try {
@@ -344,6 +362,7 @@ async function showInitialPanorama() {
     );
   } catch (error) {
     if (resolvedSource.fromQuery) {
+      sharedPanoramaFullscreenEnabled = false;
       setPanoramaChromeHidden(false);
       setUploadError(
         error instanceof Error ? error.message : '无法读取分享全景图'

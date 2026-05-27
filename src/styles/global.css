@@ -165,6 +165,8 @@ input {
 }
 
 .loading-screen[hidden],
+.panorama-badge[hidden],
+.control-panel[hidden],
 .upload-error[hidden] {
   display: none;
 }

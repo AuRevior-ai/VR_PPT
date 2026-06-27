@@ -17,7 +17,7 @@ https://aurevior-ai.github.io/VR_PPT/courseware/
 页面流程：
 1. 首页循环播放 assets/home-loop.mp4。
 2. 点击后进入引入互动页。
-3. 第 3/4/5 页为 VR 全景页，使用 GitHub Pages 素材源，断网时回退到本地 assets 中的全景图。
-4. 第 3/4/5 页使用左右小按钮切换上下页。
-5. 第 6 页为对话占位页，暂不制作语音和对话按钮。
+3. 第 3/4 页为 VR 全景页，使用本地 assets 中的真实全景图。
+4. 第 3/4 页使用左右小按钮切换上下页。
+5. 第 5 页为 AI 学长对话页，点击三个气泡分别播放对应动画。
 6. 封底页循环播放 assets/outro-loop.mp4。

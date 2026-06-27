@@ -15,29 +15,41 @@ export const slides = [
   {
     id: 'vr-playground',
     type: 'vr',
-    source:
-      'https://aurevior-ai.github.io/VR_PPT_assets/customer/3-playground-vr.png',
+    source: './assets/vr-playground.png',
     fallbackSource: './assets/vr-playground.png'
   },
   {
     id: 'vr-classroom',
     type: 'vr',
-    source:
-      'https://aurevior-ai.github.io/VR_PPT_assets/customer/4-classroom-vr.png',
+    source: './assets/vr-classroom.png',
     fallbackSource: './assets/vr-classroom.png'
   },
   {
-    id: 'vr-quiet-classroom',
-    type: 'vr',
-    source:
-      'https://aurevior-ai.github.io/VR_PPT_assets/customer/5-quiet-classroom-vr.png',
-    fallbackSource: './assets/vr-quiet-classroom.png'
-  },
-  {
     id: 'dialogue',
-    type: 'image',
-    src: './assets/dialogue.png',
-    nav: true
+    type: 'dialogue',
+    src: './assets/dialogue-loop.mp4',
+    poster: './assets/dialogue.png',
+    nav: true,
+    bubbles: [
+      {
+        id: 'play',
+        label: '下课玩什么？',
+        variant: 'blue',
+        responseVideo: './assets/recess-reply.mp4'
+      },
+      {
+        id: 'homework',
+        label: '作业多不多？',
+        variant: 'orange',
+        responseVideo: './assets/homework-reply.mp4'
+      },
+      {
+        id: 'miss-mom',
+        label: '想妈妈了怎么办？',
+        variant: 'green',
+        responseVideo: './assets/miss-mom-reply.mp4'
+      }
+    ]
   },
   {
     id: 'outro',

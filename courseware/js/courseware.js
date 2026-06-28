@@ -1,5 +1,6 @@
 import { slides } from './courseware-config.js';
 import {
+  canRevealDialogueResponseVideo,
   isElementWithinActiveSlide,
   shouldDeferHomeAdvanceForFullscreen
 } from './courseware-navigation.js';
@@ -9,6 +10,7 @@ const stage = document.getElementById('courseware');
 const viewers = new Map();
 let preloadStarted = false;
 let activeIndex = 0;
+let dialogueResponseSequence = 0;
 
 function iconPath(direction) {
   const points =
@@ -303,14 +305,49 @@ function playDialogueResponse(button) {
     return;
   }
 
+  const requestId = String(dialogueResponseSequence + 1);
+  dialogueResponseSequence += 1;
+  video.dataset.dialogueRequest = requestId;
+  video.hidden = true;
+
   if (video.getAttribute('src') !== source) {
     video.src = source;
+    video.load();
   }
 
-  video.hidden = false;
-  video.currentTime = 0;
-  void video.play().catch(() => {
-    video.hidden = true;
+  try {
+    video.currentTime = 0;
+  } catch {
+    // Some browsers cannot seek until metadata is available.
+  }
+
+  const revealWhenReady = () => {
+    if (video.dataset.dialogueRequest !== requestId) {
+      video.removeEventListener('loadeddata', revealWhenReady);
+      video.removeEventListener('canplay', revealWhenReady);
+      return;
+    }
+
+    if (!canRevealDialogueResponseVideo(video)) {
+      return;
+    }
+
+    video.hidden = false;
+    video.removeEventListener('loadeddata', revealWhenReady);
+    video.removeEventListener('canplay', revealWhenReady);
+  };
+
+  video.addEventListener('loadeddata', revealWhenReady);
+  video.addEventListener('canplay', revealWhenReady);
+  revealWhenReady();
+
+  void video.play().then(revealWhenReady).catch(() => {
+    if (video.dataset.dialogueRequest === requestId) {
+      video.hidden = true;
+    }
+
+    video.removeEventListener('loadeddata', revealWhenReady);
+    video.removeEventListener('canplay', revealWhenReady);
   });
 }
 
